@@ -1,26 +1,32 @@
-// import React from 'react'
 import { ReactElement } from "react";
 import { Piece } from "../Interfaces";
 import CapturedPieces from "./CapturedPieces";
+import Score from "./Score";
 
 interface SidePanelProps {
-    capturedPieces: Piece[];
+    color: string;
+    capturedWhite: Piece[];
+    capturedBlack: Piece[];
 }
 
-const SidePanel = ({ capturedPieces }: SidePanelProps) => {
+const SidePanel = ({ color, capturedWhite, capturedBlack }: SidePanelProps) => {
+    const children = color === "white" ? capturedBlack : capturedWhite;
+
     const getPiecesByCode = (code: string): ReactElement | undefined => {
-        const filteredPieces = capturedPieces.filter(
-            (piece) => piece.code === code
-        );
+        const filteredPieces = children.filter((piece) => piece.code === code);
         if (filteredPieces?.length > 0) {
-            return <CapturedPieces type="pawns" pieces={filteredPieces} />;
+            return <CapturedPieces type={code} pieces={filteredPieces} />;
         }
         return;
     };
 
     return (
-        <div className="mx-2 bg-orange-100 min-w-60 max-w-96 h-1/3">
-            <div>SidePanel</div>
+        <div className="mx-2 p-1 bg-orange-100 min-w-60 h-1/3">
+            <Score
+                color={color}
+                capturedWhite={capturedWhite}
+                capturedBlack={capturedBlack}
+            />
 
             {getPiecesByCode("P")}
             {getPiecesByCode("N")}

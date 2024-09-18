@@ -12,7 +12,7 @@ interface RecordedMovesProps {
 const RecordedMoves = ({ moves, onNextMove }: RecordedMovesProps) => {
     return (
         <div>
-            <div className="text-right m-4">
+            <div className="text-right m-4 overflow-auto scroll-m-4">
                 <button className="btn btn-accent" onClick={onNextMove}>
                     <svg
                         width="24"

@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { CapturedPieces, GameState, MoveRecord, Piece } from "../Interfaces";
 import { initialPositions } from "./PositionConstants";
+import { games as gameLibrary } from "../../public/game-library";
 import Board from "./Board";
 import SidePanel from "./SidePanel";
 import RecordedMoves from "./RecordedMoves";
-import {
-    getAnnotatedMove,
-    getSourceNotation,
-} from "../services/MoveServices";
+import { getAnnotatedMove, getSourceNotation } from "../services/MoveServices";
+declare type GameType = keyof typeof gameLibrary;
 
 // notation regular expression
 // ^(\w)?(\w)?(x)?([a-z])([1-8])([+=?!]{0,2})$
@@ -17,6 +16,7 @@ const Game = () => {
         activePlayer: "",
         boardPositions: {},
     });
+    const [selectedGame, setSelectedGame] = useState<string>("");
     const [currentMoveIndex, setCurrentMoveIndex] = useState<number>(0);
     const [moveRecords, setMoveRecords] = useState<MoveRecord[]>([]);
     const [loadedGameMoves, setLoadedGameMoves] = useState<string[]>([]);
@@ -26,7 +26,7 @@ const Game = () => {
     });
 
     useEffect(() => {
-        loadGame();
+        loadGame(null);
     }, []);
 
     useEffect(() => {
@@ -40,11 +40,28 @@ const Game = () => {
         }
     }, [gameState]);
 
-    const loadGame = (): void => {
+    const initGame = (e: ChangeEvent): void => {
+        const gameTitle: string = (e.target as HTMLTextAreaElement).value;
+        setSelectedGame(gameTitle);
+        loadGame(gameLibrary[gameTitle as GameType]);
+        setMoveRecords([]);
+        setCurrentMoveIndex(0);
+        setCapturedPieces({
+            white: [],
+            black: [],
+        });
+        setGameState({
+            activePlayer: "white",
+            boardPositions: { ...initialPositions },
+        });
+    };
+
+    const loadGame = (gameString: string | null): void => {
+        const loadedGame = gameString || "1. e4 c5";
         let tmpLoadedGameMoves: string[] = [];
-        const gameString =
-            "1. e4 c5 2. Nf3 d6 3. Bb5+ Bd7 4. Bxd7 Qxd7 5. c4 Nc6 6. Nc3 Nf6 7. 0-0 g6 8. d4 cxd4 9. Nxd4 Bg7 10. Nde2 Qe6!? 11. Nd5 Qxe4 12. Nc7+ Kd7 13. Nxa8 Qxc4 14. Nb6+ axb6 15. Nc3! Ra8";
-        const savedGame = gameString
+        // const gameString =
+        //     "1. e4 c5 2. Nf3 d6 3. Bb5+ Bd7 4. Bxd7 Qxd7 5. c4 Nc6 6. Nc3 Nf6 7. 0-0 g6 8. d4 cxd4 9. Nxd4 Bg7 10. Nde2 Qe6!? 11. Nd5 Qxe4 12. Nc7+ Kd7 13. Nxa8 Qxc4 14. Nb6+ axb6 15. Nc3! Ra8";
+        const savedGame = loadedGame
             .split(/\s*\d+\s*\.\s*/)
             .filter((item) => item !== "");
 
@@ -142,15 +159,40 @@ const Game = () => {
     };
 
     return (
-        // <div className="grid grid-cols-[_minmax(0,_1fr)_minmax(0,_200px)_minmax(900px,_1fr)_200px_minmax(0,_200px)]">
-        <div className="flex justify-center my-2">
-            <div>
-                <SidePanel capturedPieces={capturedPieces["white"]} />
-            </div>
-            <Board positions={gameState.boardPositions} />
-            <div>
-                <SidePanel capturedPieces={capturedPieces["black"]} />
-                <RecordedMoves moves={moveRecords} onNextMove={nextMove} />
+        <div>
+            <h3 className="text-center py-2">
+                <select
+                    className="select select-bordered select-sm w-full max-w-xs"
+                    value={selectedGame}
+                    onChange={initGame}
+                >
+                    <option disabled value="">
+                        Select a game
+                    </option>
+                    {Object.keys(gameLibrary).map((title) => (
+                        <option key={title} value={title}>
+                            {title}
+                        </option>
+                    ))}
+                </select>
+            </h3>
+            <div className="flex justify-center my-2">
+                <div>
+                    <SidePanel
+                        color="black"
+                        capturedWhite={capturedPieces["white"]}
+                        capturedBlack={capturedPieces["black"]}
+                    />
+                </div>
+                <Board positions={gameState.boardPositions} />
+                <div>
+                    <SidePanel
+                        color="white"
+                        capturedWhite={capturedPieces["white"]}
+                        capturedBlack={capturedPieces["black"]}
+                    />
+                    <RecordedMoves moves={moveRecords} onNextMove={nextMove} />
+                </div>
             </div>
         </div>
     );

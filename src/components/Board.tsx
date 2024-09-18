@@ -36,7 +36,6 @@ const Board = ({ positions }: BoardProps) => {
                 });
             })}
         </div>
-        // </div>
     );
 };
 
