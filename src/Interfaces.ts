@@ -22,3 +22,13 @@ export interface MoveRecord {
     white: string;
     black: string;
 }
+
+export interface AnnotatedMove {
+    base: string;
+    annotation: string;
+}
+
+export interface CapturedPieces {
+    white: Piece[];
+    black: Piece[];
+}

@@ -1,0 +1,10 @@
+[Event "World Chess Championship 2021, Game 6"]
+[Site ""]
+[Date "2021.12.03"]
+[Round "6"]
+[White "Magnus Calsen"]
+[Black "Ian Nepomniachtchi"]
+[Result "1-0"]
+[Link "https://en.wikipedia.org/wiki/Carlsen_versus_Nepomniachtchi,_World_Chess_Championship_2021,_Game_6#The_game"]
+
+1. d4 Nf6 2. Nf3 d5 3. g3 e6 4. Bg2 Be7 5. O-O O-O 6. b3 c5 7. dxc5 Bxc5 8. c4 dxc4 9. Qc2

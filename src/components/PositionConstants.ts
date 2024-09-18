@@ -10,6 +10,9 @@ export enum Files {
     g,
     h,
 }
+
+export declare type FileType = keyof typeof Files;
+
 export enum PieceValues {
     pawn = 1,
     knight = 3,

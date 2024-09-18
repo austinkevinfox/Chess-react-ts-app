@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-
 import { Piece } from "../Interfaces";
+import { getImageSource } from "../services/PieceServices";
 
 interface SquareProps {
     bgUtilityClass: string;
@@ -25,14 +25,8 @@ const Square = ({ bgUtilityClass, file, rank, piece }: SquareProps) => {
     };
 
     useEffect(() => {
-        let tmpImageSrc: string;
-        if (piece) {
-            const colorInitial: string = piece.color.substring(0, 1);
-            tmpImageSrc = `/svg-no-shadow/${colorInitial}_${piece.name}_svg_NoShadow.svg`;
-            setImageSrc(tmpImageSrc);
-        } else {
-            setImageSrc("");
-        }
+        const tmpImageSrc: string = getImageSource(piece);
+        setImageSrc(tmpImageSrc);
     }, [piece]);
 
     const toggleSelection = (): void => {
