@@ -22,11 +22,14 @@ const SidePanel = ({ color, capturedWhite, capturedBlack }: SidePanelProps) => {
 
     return (
         <div className="mx-2 p-1 bg-orange-100 min-w-60 h-1/3">
-            <Score
-                color={color}
-                capturedWhite={capturedWhite}
-                capturedBlack={capturedBlack}
-            />
+            <div className="flex justify-between">
+                {color}
+                <Score
+                    color={color}
+                    capturedWhite={capturedWhite}
+                    capturedBlack={capturedBlack}
+                />
+            </div>
 
             {getPiecesByCode("P")}
             {getPiecesByCode("N")}

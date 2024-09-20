@@ -6,16 +6,16 @@ import Board from "./Board";
 import SidePanel from "./SidePanel";
 import RecordedMoves from "./RecordedMoves";
 import { getAnnotatedMove, getSourceNotation } from "../services/MoveServices";
+import ControlBar from "./RecordedGames/ControlBar";
 declare type GameType = keyof typeof gameLibrary;
-
-// notation regular expression
-// ^(\w)?(\w)?(x)?([a-z])([1-8])([+=?!]{0,2})$
 
 const Game = () => {
     const [gameState, setGameState] = useState<GameState>({
         activePlayer: "",
         boardPositions: {},
     });
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [isGameOver, setIsGameOver] = useState<boolean>(false);
     const [selectedGame, setSelectedGame] = useState<string>("");
     const [currentMoveIndex, setCurrentMoveIndex] = useState<number>(0);
     const [moveRecords, setMoveRecords] = useState<MoveRecord[]>([]);
@@ -40,10 +40,31 @@ const Game = () => {
         }
     }, [gameState]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        let timer = 0;
+        if (isPlaying) {
+            if (!isGameOver) {
+                timer = setTimeout(() => {
+                    nextMove();
+                }, 1000);
+            } else {
+                setIsPlaying(false);
+            }
+        }
+        return () => clearTimeout(timer);
+    });
+
     const initGame = (e: ChangeEvent): void => {
         const gameTitle: string = (e.target as HTMLTextAreaElement).value;
         setSelectedGame(gameTitle);
         loadGame(gameLibrary[gameTitle as GameType]);
+        resetGame();
+    };
+
+    const resetGame = (): void => {
+        setIsPlaying(false);
+        setIsGameOver(false);
         setMoveRecords([]);
         setCurrentMoveIndex(0);
         setCapturedPieces({
@@ -80,11 +101,15 @@ const Game = () => {
     const getNextPlayer = (): string =>
         gameState!.activePlayer === "white" ? "black" : "white";
 
+    const play = (): void => {
+        setIsPlaying(true);
+    };
+
     const nextMove = (): void => {
         const rawMove = loadedGameMoves[currentMoveIndex];
 
         if (!rawMove) {
-            console.log("end of game");
+            setIsGameOver(true);
         } else {
             const annotatedMove = getAnnotatedMove(rawMove);
             let nextMove = annotatedMove.base;
@@ -109,15 +134,24 @@ const Game = () => {
                 }
             }
 
-            if (nextMove === "0-0") {
+            if (/^[O0]-[O0]$/.test(nextMove)) {
                 // Castle King-side
-                const kingPiece: Piece = tmpPositions["e1"]!;
-                const rookPiece: Piece = tmpPositions["h1"]!;
-                tmpPositions["g1"] = kingPiece;
-                tmpPositions["f1"] = rookPiece;
-                tmpPositions["e1"] = null;
-                tmpPositions["h1"] = null;
-            } else if (nextMove === "0-0-0") {
+                if (gameState.activePlayer === "white") {
+                    const kingPiece: Piece = tmpPositions["e1"]!;
+                    const rookPiece: Piece = tmpPositions["h1"]!;
+                    tmpPositions["g1"] = kingPiece;
+                    tmpPositions["f1"] = rookPiece;
+                    tmpPositions["e1"] = null;
+                    tmpPositions["h1"] = null;
+                } else {
+                    const kingPiece: Piece = tmpPositions["e8"]!;
+                    const rookPiece: Piece = tmpPositions["h8"]!;
+                    tmpPositions["g8"] = kingPiece;
+                    tmpPositions["f8"] = rookPiece;
+                    tmpPositions["e8"] = null;
+                    tmpPositions["h8"] = null;
+                }
+            } else if (/^[O0]-[O0]-[O0]$/.test(nextMove)) {
                 // Castle Queen-side
                 const kingPiece: Piece = tmpPositions["e1"]!;
                 const rookPiece: Piece = tmpPositions["a1"]!;
@@ -159,39 +193,36 @@ const Game = () => {
     };
 
     return (
-        <div>
-            <h3 className="text-center py-2">
-                <select
-                    className="select select-bordered select-sm w-full max-w-xs"
-                    value={selectedGame}
-                    onChange={initGame}
-                >
-                    <option disabled value="">
-                        Select a game
-                    </option>
-                    {Object.keys(gameLibrary).map((title) => (
-                        <option key={title} value={title}>
-                            {title}
-                        </option>
-                    ))}
-                </select>
-            </h3>
-            <div className="flex justify-center my-2">
-                <div>
-                    <SidePanel
-                        color="black"
-                        capturedWhite={capturedPieces["white"]}
-                        capturedBlack={capturedPieces["black"]}
-                    />
-                </div>
-                <Board positions={gameState.boardPositions} />
-                <div>
-                    <SidePanel
-                        color="white"
-                        capturedWhite={capturedPieces["white"]}
-                        capturedBlack={capturedPieces["black"]}
-                    />
-                    <RecordedMoves moves={moveRecords} onNextMove={nextMove} />
+        <div className="grid grid-cols-[200px_minmax(400px,_1fr)] items-start">
+            <RecordedMoves moves={moveRecords} />
+            <div>
+                <ControlBar
+                    selectedGameTitle={selectedGame}
+                    gameTitleList={Object.keys(gameLibrary)}
+                    onChangeGame={initGame}
+                    onRewind={resetGame}
+                    onNextMove={nextMove}
+                    onPlay={play}
+                    isPlaying={isPlaying}
+                    isGameOver={isGameOver}
+                />
+
+                <div className="flex justify-center my-2 h-4/5">
+                    <div>
+                        <SidePanel
+                            color="black"
+                            capturedWhite={capturedPieces["white"]}
+                            capturedBlack={capturedPieces["black"]}
+                        />
+                    </div>
+                    <Board positions={gameState.boardPositions} />
+                    <div>
+                        <SidePanel
+                            color="white"
+                            capturedWhite={capturedPieces["white"]}
+                            capturedBlack={capturedPieces["black"]}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
