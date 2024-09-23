@@ -24,6 +24,8 @@ const Game = () => {
         white: [],
         black: [],
     });
+    const [lastSource, setLastSource] = useState<string>("");
+    const [lastTarget, setLastTarget] = useState<string>("");
 
     useEffect(() => {
         loadGame(null);
@@ -47,7 +49,7 @@ const Game = () => {
             if (!isGameOver) {
                 timer = setTimeout(() => {
                     nextMove();
-                }, 1000);
+                }, 3000);
             } else {
                 setIsPlaying(false);
             }
@@ -103,6 +105,11 @@ const Game = () => {
 
     const play = (): void => {
         setIsPlaying(true);
+        nextMove();
+    };
+
+    const pause = (): void => {
+        setIsPlaying(false);
     };
 
     const nextMove = (): void => {
@@ -115,6 +122,7 @@ const Game = () => {
             let nextMove = annotatedMove.base;
             const isCapture = /x/.test(nextMove);
             const tmpPositions = { ...gameState.boardPositions };
+            let sourceNotation = "";
             let targetNotation: string = "";
             let sourceHint: string = "";
 
@@ -162,7 +170,7 @@ const Game = () => {
             } else {
                 targetNotation = nextMove.slice(-2);
 
-                const sourceNotation: string = getSourceNotation({
+                sourceNotation = getSourceNotation({
                     gameState,
                     nextMove,
                     isCapture,
@@ -183,6 +191,8 @@ const Game = () => {
                 blackMove.black = rawMove;
             }
 
+            setLastSource(sourceNotation);
+            setLastTarget(targetNotation);
             setMoveRecords(tmpMoveRecords);
             setCurrentMoveIndex((previous) => ++previous);
             setGameState({
@@ -203,6 +213,7 @@ const Game = () => {
                     onRewind={resetGame}
                     onNextMove={nextMove}
                     onPlay={play}
+                    onPause={pause}
                     isPlaying={isPlaying}
                     isGameOver={isGameOver}
                 />
@@ -215,7 +226,11 @@ const Game = () => {
                             capturedBlack={capturedPieces["black"]}
                         />
                     </div>
-                    <Board positions={gameState.boardPositions} />
+                    <Board
+                        positions={gameState.boardPositions}
+                        lastSource={lastSource}
+                        lastTarget={lastTarget}
+                    />
                     <div>
                         <SidePanel
                             color="white"

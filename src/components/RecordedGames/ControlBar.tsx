@@ -15,6 +15,7 @@ interface ControlBarProps {
     onRewind: () => void;
     onNextMove: () => void;
     onPlay: () => void;
+    onPause: () => void;
     isPlaying: boolean;
     isGameOver: boolean;
 }
@@ -26,6 +27,7 @@ const ControlBar = ({
     onRewind,
     onNextMove,
     onPlay,
+    onPause,
     isPlaying,
     isGameOver,
 }: ControlBarProps) => {
@@ -34,6 +36,8 @@ const ControlBar = ({
     const onPlayPauseClick = (): void => {
         if (!isPlaying) {
             onPlay();
+        } else {
+            onPause();
         }
     };
 

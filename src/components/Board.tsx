@@ -1,16 +1,17 @@
-// import React from "react";
-
-interface BoardProps {
-    // colors: string[];
-    positions: BoardPositionHash;
-}
-
 import { ReactNode } from "react";
 import { Files } from "./PositionConstants";
 import Square from "./Square";
 import { BoardPositionHash } from "../Interfaces";
 
-const Board = ({ positions }: BoardProps) => {
+interface BoardProps {
+    // colors: string[];
+    positions: BoardPositionHash;
+    lastSource: string;
+    lastTarget: string;
+}
+
+
+const Board = ({ positions, lastSource, lastTarget }: BoardProps) => {
     const bgStrings = [
         "even:bg-slate-100 odd:bg-slate-500",
         "even:bg-slate-500 odd:bg-slate-100",
@@ -31,6 +32,8 @@ const Board = ({ positions }: BoardProps) => {
                             file={file}
                             rank={rank}
                             piece={positions[notation]}
+                            isLastSource={notation === lastSource}
+                            isLastTarget={notation === lastTarget}
                         />
                     );
                 });

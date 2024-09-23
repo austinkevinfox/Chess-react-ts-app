@@ -7,12 +7,35 @@ interface SquareProps {
     file: string;
     rank: number;
     piece: Piece | null;
+    isLastSource: boolean;
+    isLastTarget: boolean;
 }
 
-const Square = ({ bgUtilityClass, file, rank, piece }: SquareProps) => {
+const Square = ({
+    bgUtilityClass,
+    file,
+    rank,
+    piece,
+    isLastSource,
+    isLastTarget,
+}: SquareProps) => {
     const [imageSrc, setImageSrc] = useState<string>("");
     const [borderUtilityClass, setBorderUtilityClass] =
         useState<string>("ring-0");
+    const isLive = false; // Make isLive a prop when Square is used for live games
+
+    useEffect(() => {
+        const tmpImageSrc: string = getImageSource(piece);
+        setImageSrc(tmpImageSrc);
+    }, [piece]);
+
+    useEffect(() => {
+        if (isLastSource || isLastTarget) {
+            setBorderUtilityClass("ring-8");
+        } else {
+            setBorderUtilityClass("ring-0");
+        }
+    }, [isLastSource, isLastTarget]);
 
     const getLabel = (id: string): string => {
         if (id === "file" && rank === 1) {
@@ -24,16 +47,13 @@ const Square = ({ bgUtilityClass, file, rank, piece }: SquareProps) => {
         return "";
     };
 
-    useEffect(() => {
-        const tmpImageSrc: string = getImageSource(piece);
-        setImageSrc(tmpImageSrc);
-    }, [piece]);
-
     const toggleSelection = (): void => {
-        if (borderUtilityClass === "ring-0") {
-            setBorderUtilityClass("ring-8");
-        } else {
-            setBorderUtilityClass("ring-0");
+        if (isLive) {
+            if (borderUtilityClass === "ring-0") {
+                setBorderUtilityClass("ring-8");
+            } else {
+                setBorderUtilityClass("ring-0");
+            }
         }
     };
 
