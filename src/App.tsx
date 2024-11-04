@@ -4,6 +4,7 @@ import NavDrawer from "./NavDrawer";
 import Welcome from "./components/Welcome";
 import LiveGame from "./components/LiveGame";
 import MainContent from "./components/MainContent";
+import HistoricGamesList from "./components/HistoricalGames/HistoricGamesList";
 
 function App() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -19,6 +20,10 @@ function App() {
         switch (navOption) {
             case "historic":
                 setMainContent(<Game />);
+                break;
+
+            case "historic-list":
+                setMainContent(<HistoricGamesList />);
                 break;
 
             case "live":

@@ -18,6 +18,11 @@ const NavDrawer = ({ onNavItemClick }: NavDrawerProps) => {
                     </a>
                 </li>
                 <li>
+                    <a id="historic-list" onClick={onNavItemClick}>
+                        Historic Games List
+                    </a>
+                </li>
+                <li>
                     <a id="live" onClick={onNavItemClick}>
                         Live Game
                     </a>
